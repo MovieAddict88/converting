@@ -13,11 +13,25 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-$data = json_decode(file_get_contents("php://input"));
+// Handle different content types
+$content_type = isset($_SERVER['CONTENT_TYPE']) ? trim($_SERVER['CONTENT_TYPE']) : '';
+$username = '';
+$password = '';
 
-if (empty($data->username) || empty($data->password)) {
+if (strpos($content_type, 'application/json') !== false) {
+    $data = json_decode(file_get_contents("php://input"));
+    $username = $data->username ?? '';
+    $password = $data->password ?? '';
+} else {
+    // Assume form data
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
+}
+
+
+if (empty($username) || empty($password)) {
     http_response_code(400);
-    echo json_encode(["message" => "Invalid input"]);
+    echo json_encode(["message" => "Invalid input. Username and password are required."]);
     exit();
 }
 
@@ -29,12 +43,12 @@ if ($conn->connect_error) {
 }
 
 $stmt = $conn->prepare("SELECT * FROM admins WHERE username = ?");
-$stmt->bind_param("s", $data->username);
+$stmt->bind_param("s", $username);
 $stmt->execute();
 $result = $stmt->get_result();
 $admin = $result->fetch_assoc();
 
-if (!$admin || !password_verify($data->password, $admin['password'])) {
+if (!$admin || !password_verify($password, $admin['password'])) {
     http_response_code(401);
     echo json_encode(["message" => "Invalid credentials"]);
     exit();
@@ -59,6 +73,7 @@ $token = array(
 );
 
 $jwt = JWT::encode($token, JWT_SECRET, 'HS256');
+http_response_code(200);
 echo json_encode(
     array(
         "message" => "Successful login.",
