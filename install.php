@@ -54,7 +54,7 @@ if ($step === 2) {
     }
 
     // 4. Create default admin
-    $hashed_password = password_hash($admin_pass, PASSWORD_DEFAULT);
+    $hashed_password = password_hash($admin_pass, PASSWORD_BCRYPT);
     $stmt = $conn->prepare("INSERT INTO admins (username, password) VALUES (?, ?)");
     $stmt->bind_param("ss", $admin_user, $hashed_password);
     $stmt->execute();
