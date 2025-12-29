@@ -1,0 +1,196 @@
+{
+  "design_system": {
+    "identity": {
+      "name": "NeonVox",
+      "archetype": "Electric & Neon",
+      "vibe": "Tokyo Nightlife meets Cyberpunk Studio",
+      "core_values": ["High Energy", "Visual Rhythm", "Immersive", "Playful Competition"]
+    },
+    "typography": {
+      "font_family": {
+        "headings": "Unbounded, sans-serif",
+        "body": "Outfit, sans-serif",
+        "mono": "Space Mono, monospace",
+        "lyrics": "Syne, sans-serif"
+      },
+      "weights": {
+        "headings": "800",
+        "body": "400",
+        "bold": "700"
+      },
+      "scale": {
+        "hero": "text-6xl md:text-8xl tracking-tighter",
+        "h1": "text-4xl md:text-5xl tracking-tight",
+        "h2": "text-3xl tracking-tight",
+        "h3": "text-2xl font-bold",
+        "body": "text-base leading-relaxed",
+        "small": "text-sm text-muted-foreground"
+      },
+      "imports": [
+        "@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Outfit:wght@300;400;600&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap');"
+      ]
+    },
+    "colors": {
+      "palette": {
+        "background": "#030305",
+        "foreground": "#FFFFFF",
+        "card": "#0A0A0F",
+        "card_foreground": "#FFFFFF",
+        "primary": "#FF0099",
+        "primary_foreground": "#FFFFFF",
+        "secondary": "#00F0FF",
+        "secondary_foreground": "#000000",
+        "accent": "#7000FF",
+        "accent_foreground": "#FFFFFF",
+        "muted": "#1A1A24",
+        "muted_foreground": "#A1A1AA",
+        "border": "#27272A",
+        "input": "#18181B",
+        "ring": "#FF0099",
+        "success": "#00FF94",
+        "warning": "#FFD600",
+        "error": "#FF0055"
+      },
+      "gradients": {
+        "hero": "linear-gradient(135deg, #FF0099 0%, #7000FF 100%)",
+        "glass": "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)",
+        "glow": "radial-gradient(circle at center, rgba(112,0,255,0.4) 0%, transparent 70%)"
+      }
+    },
+    "visual_enhancers": {
+      "radius": {
+        "default": "0.75rem",
+        "button": "9999px",
+        "card": "1rem"
+      },
+      "shadows": {
+        "neon_pink": "0 0 20px rgba(255, 0, 153, 0.5)",
+        "neon_blue": "0 0 20px rgba(0, 240, 255, 0.5)",
+        "glass": "0 8px 32px 0 rgba(0, 0, 0, 0.37)"
+      },
+      "borders": {
+        "glass": "1px solid rgba(255, 255, 255, 0.1)",
+        "neon": "1px solid rgba(255, 0, 153, 0.5)"
+      }
+    },
+    "layout_strategies": {
+      "public_home": "Tetris Grid",
+      "admin_dashboard": "Control Room Grid",
+      "player": "Immersive Fullscreen",
+      "spacing": "Generous (2x standard)"
+    },
+    "motion": {
+      "hover": "transform: translateY(-2px) scale(1.02)",
+      "transition": "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      "page_load": "opacity: 0; animation: fadeIn 0.5s ease-out forwards;"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-white shadow-[0_0_15px_rgba(255,0,153,0.4)] hover:shadow-[0_0_25px_rgba(255,0,153,0.6)] hover:scale-105 transition-all duration-300 rounded-full font-bold tracking-wide uppercase text-sm px-8 py-3",
+      "secondary": "bg-transparent border border-secondary text-secondary hover:bg-secondary hover:text-black transition-all duration-300 rounded-full font-bold tracking-wide uppercase text-sm px-8 py-3",
+      "ghost": "text-muted-foreground hover:text-white hover:bg-white/5 transition-colors rounded-lg px-4 py-2"
+    },
+    "cards": {
+      "glass": "bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden hover:border-white/20 transition-colors",
+      "solid": "bg-card border border-border rounded-xl shadow-sm"
+    },
+    "inputs": {
+      "default": "bg-input/50 border-transparent focus:border-primary focus:ring-2 focus:ring-primary/50 rounded-lg text-white placeholder:text-muted-foreground/50 h-12 px-4 transition-all"
+    },
+    "navigation": {
+      "glass_header": "fixed top-0 w-full z-50 bg-black/20 backdrop-blur-lg border-b border-white/5 h-20 flex items-center px-6 md:px-12 justify-between"
+    }
+  },
+  "assets": {
+    "images": {
+      "hero_bg": {
+        "url": "https://images.unsplash.com/photo-1683582544815-66d1ea55d3c2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzZ8MHwxfHNlYXJjaHwxfHxwYXJ0eSUyMGNyb3dkJTIwc2lsaG91ZXR0ZSUyMGNvbmNlcnR8ZW58MHx8fHwxNzY3MDM2NzUwfDA&ixlib=rb-4.1.0&q=85",
+        "alt": "Silhouetted party crowd with atmospheric lighting",
+        "usage": "Hero section background with heavy overlay"
+      },
+      "login_bg": {
+        "url": "https://images.unsplash.com/photo-1766339796353-86a05ecdeb0d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMG5lb24lMjBzb3VuZCUyMHdhdmVzfGVufDB8fHx8MTc2NzAzNjc1Mnww&ixlib=rb-4.1.0&q=85",
+        "alt": "Abstract green neon waves",
+        "usage": "Admin login page background"
+      },
+      "empty_state_music": {
+        "url": "https://images.unsplash.com/photo-1719437364093-82c24d719303?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxuZW9uJTIwa2FyYW9rZSUyMG1pY3JvcGhvbmUlMjBzdGFnZXxlbnwwfHx8fDE3NjcwMzY3NDh8MA&ixlib=rb-4.1.0&q=85",
+        "alt": "Neon microphone close up",
+        "usage": "Empty library or 'No songs found' state"
+      },
+      "player_placeholder": {
+        "url": "https://images.unsplash.com/photo-1759771963975-8a4885446f1f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMG5lb24lMjBzb3VuZCUyMHdhdmVzfGVufDB8fHx8MTc2NzAzNjc1Mnww&ixlib=rb-4.1.0&q=85",
+        "alt": "Glowing purple ring",
+        "usage": "Default background for audio-only tracks"
+      }
+    },
+    "icons": {
+      "library": "lucide-react",
+      "preferred_set": ["Mic2", "Music2", "Play", "Pause", "SkipForward", "Volume2", "Search", "Upload", "Settings", "User", "BarChart3"]
+    }
+  },
+  "page_specifics": {
+    "public_home": {
+      "layout": "Hero section with 'Enter the Stage' CTA, followed by 'Trending Now' bento grid.",
+      "features": ["Search bar with glass effect", "Genre pills with neon borders", "Song cards with hover-reveal play buttons"]
+    },
+    "player": {
+      "layout": "Fullscreen immersive. Video/Visualizer takes 100% height.",
+      "lyrics": "Overlay at bottom center. Current line: Text-4xl White Glow. Next line: Text-2xl Gray. Font: Syne.",
+      "scoring": "Top right corner. Live counter with 'Perfect/Good/Miss' popups. Use 'Animate.css' or Framer Motion for score bumps."
+    },
+    "admin_dashboard": {
+      "layout": "Sidebar navigation (left), Content area (right). Darker, more utilitarian but still 'studio' vibe.",
+      "tables": "Shadcn Table component. Row hover: bg-white/5. Header: uppercase tracking-widest text-xs text-muted-foreground.",
+      "upload": "Drag and drop zone with neon dashed border."
+    }
+  },
+  "instructions_to_main_agent": {
+    "setup": [
+      "Install fonts: Unbounded, Outfit, Space Mono, Syne via Google Fonts in index.css",
+      "Configure tailwind.config.js with the provided color palette and font families",
+      "Ensure 'lucide-react' is installed for icons",
+      "Install 'framer-motion' for animations if not present",
+      "Install 'sonner' for toast notifications"
+    ],
+    "styling_rules": [
+      "NEVER use pure black (#000000). Use the provided #030305.",
+      "Use 'backdrop-blur' heavily for overlays to maintain readability over video backgrounds.",
+      "Buttons must have the 'glow' effect defined in components section.",
+      "Admin panel should feel like a music production software (dark, precise, neon accents)."
+    ],
+    "functionality_notes": {
+      "player": "Ensure the player handles .mid/.kar files by converting/rendering them visually if possible, or fallback to audio + lyrics parsing.",
+      "scoring": "Mock the real-time scoring visualization if backend audio processing isn't fully hooked up yet, but build the UI to support rapid updates."
+    }
+  },
+  "universal_guidelines": {
+    "general": [
+      "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+      "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+      "Create depth through layered design elements with z-index hierarchy",
+      "Use glass-morphism effects with backdrop filters (12-24px blur)",
+      "You MUST NOT apply universal transition. Eg: 'transition: all'. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+      "You MUST NOT center align the app container, ie do not add '.App { text-align: center; }' in the css file. This disrupts the human natural reading flow of text",
+      "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+      "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons."
+    ],
+    "motion": [
+      "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+      "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+      "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary."
+    ],
+    "assets": [
+      "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN"
+    ],
+    "components": [
+      "Prioritize using pre-existing components from src/components/ui when applicable",
+      "Create new components that match the style and conventions of existing components when needed",
+      "Examine existing components to understand the project's component patterns before creating new ones",
+      "Components MUST use named exports (export const ComponentName = ...)",
+      "Pages MUST use default exports (export default function PageName() {...})",
+      "Use 'sonner' for toasts. Sonner component are located in '/app/src/components/ui/sonner.tsx'"
+    ]
+  }
+}
