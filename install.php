@@ -18,8 +18,8 @@ if ($step === 2) {
     $db_name = $_POST['db_name'];
     $db_user = $_POST['db_user'];
     $db_pass = $_POST['db_pass'];
-    $admin_user = $_POST['admin_user'];
-    $admin_pass = $_POST['admin_pass'];
+    $admin_user = 'admin';
+    $admin_pass = 'admin123';
     $youtube_api_key = $_POST['youtube_api_key'];
 
     // Generate a random JWT secret
@@ -128,6 +128,9 @@ if ($step === 2) {
     <?php elseif ($step === 2): ?>
         <p class="success"><b>Installation Complete!</b></p>
         <p>The application has been installed successfully.</p>
+        <p>You can now log in with the default credentials:</p>
+        <p><b>Username:</b> admin</p>
+        <p><b>Password:</b> admin123</p>
         <p class="error"><b>IMPORTANT:</b> For security reasons, please delete this `install.php` file now.</p>
     <?php endif; ?>
 </body>

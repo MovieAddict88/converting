@@ -82,7 +82,7 @@ class KaraokeAPITester:
         response = self.run_test(
             "Admin Login (Valid Credentials)",
             "POST",
-            "auth.php",
+            "auth/login",
             200,
             data={"username": "admin", "password": "admin123"}
         )
@@ -96,7 +96,7 @@ class KaraokeAPITester:
         self.run_test(
             "Admin Login (Invalid Credentials)",
             "POST",
-            "auth.php",
+            "auth/login",
             401,
             data={"username": "admin", "password": "wrong"}
         )
