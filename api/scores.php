@@ -5,15 +5,17 @@ $allowed_origin = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'http
 $allowed_origin .= '://' . $_SERVER['HTTP_HOST'];
 
 header("Access-Control-Allow-Origin: " . $allowed_origin);
-header('Access-Control-Allow-Credentials: true');
+header('Access-control-allow-credentials: true');
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: GET, POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-if ($conn->connect_error) {
+try {
+    $pdo = new PDO('sqlite:' . DB_PATH);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(["message" => "Database connection failed"]);
+    echo json_encode(["message" => "Database connection failed: " . $e->getMessage()]);
     exit();
 }
 
@@ -23,20 +25,16 @@ if ($method === 'GET') {
     if (isset($_GET['song_id'])) {
         $song_id = $_GET['song_id'];
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
-        $stmt = $conn->prepare("SELECT * FROM scores WHERE song_id = ? ORDER BY score DESC LIMIT ?");
-        $stmt->bind_param("si", $song_id, $limit);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $scores = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt = $pdo->prepare("SELECT * FROM scores WHERE song_id = :song_id ORDER BY score DESC LIMIT :limit");
+        $stmt->execute([':song_id' => $song_id, ':limit' => $limit]);
+        $scores = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($scores);
     } else {
         // Leaderboard
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
-        $stmt = $conn->prepare("SELECT * FROM scores ORDER BY score DESC LIMIT ?");
-        $stmt->bind_param("i", $limit);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $scores = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt = $pdo->prepare("SELECT * FROM scores ORDER BY score DESC LIMIT :limit");
+        $stmt->execute([':limit' => $limit]);
+        $scores = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($scores);
     }
 } elseif ($method === 'POST') {
@@ -48,19 +46,32 @@ if ($method === 'GET') {
         exit();
     }
 
-    $id = uniqid();
+    $id = bin2hex(random_bytes(18)); // Generate a 36-character hex ID
     $created_at = date('Y-m-d H:i:s');
 
-    $stmt = $conn->prepare("INSERT INTO scores (id, song_id, player_name, score, accuracy, created_at) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssids", $id, $data->song_id, $data->player_name, $data->score, $data->accuracy, $created_at);
+    $stmt = $pdo->prepare("INSERT INTO scores (id, song_id, player_name, score, accuracy, created_at) VALUES (:id, :song_id, :player_name, :score, :accuracy, :created_at)");
 
-    if ($stmt->execute()) {
+    $params = [
+        ':id' => $id,
+        ':song_id' => $data->song_id,
+        ':player_name' => $data->player_name,
+        ':score' => $data->score,
+        ':accuracy' => $data->accuracy,
+        ':created_at' => $created_at
+    ];
+
+    if ($stmt->execute($params)) {
         http_response_code(201);
-        echo json_encode(["id" => $id, "song_id" => $data->song_id, "player_name" => $data->player_name, "score" => $data->score, "accuracy" => $data->accuracy, "created_at" => $created_at]);
+        echo json_encode([
+            "id" => $id,
+            "song_id" => $data->song_id,
+            "player_name" => $data->player_name,
+            "score" => $data->score,
+            "accuracy" => $data->accuracy,
+            "created_at" => $created_at
+        ]);
     } else {
         http_response_code(500);
         echo json_encode(["message" => "Failed to create score."]);
     }
 }
-
-$conn->close();

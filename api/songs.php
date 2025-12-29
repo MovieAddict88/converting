@@ -11,10 +11,12 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: GET, POST, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-if ($conn->connect_error) {
+try {
+    $pdo = new PDO('sqlite:' . DB_PATH);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(["message" => "Database connection failed"]);
+    echo json_encode(["message" => "Database connection failed: " . $e->getMessage()]);
     exit();
 }
 
@@ -23,19 +25,15 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     if (isset($_GET['id'])) {
         $id = $_GET['id'];
-        $stmt = $conn->prepare("SELECT * FROM songs WHERE id = ?");
-        $stmt->bind_param("s", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $song = $result->fetch_assoc();
+        $stmt = $pdo->prepare("SELECT * FROM songs WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $song = $stmt->fetch(PDO::FETCH_ASSOC);
         echo json_encode($song);
     } else {
         $search = isset($_GET['search']) ? "%" . $_GET['search'] . "%" : "%";
-        $stmt = $conn->prepare("SELECT * FROM songs WHERE title LIKE ? OR artist LIKE ? ORDER BY created_at DESC");
-        $stmt->bind_param("ss", $search, $search);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $songs = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt = $pdo->prepare("SELECT * FROM songs WHERE title LIKE :search OR artist LIKE :search ORDER BY created_at DESC");
+        $stmt->execute([':search' => $search]);
+        $songs = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($songs);
     }
 } elseif ($method === 'POST') {
@@ -47,7 +45,7 @@ if ($method === 'GET') {
         exit();
     }
 
-    $id = uniqid();
+    $id = bin2hex(random_bytes(18)); // Generate a 36-character hex ID
     $created_at = date('Y-m-d H:i:s');
     $file_path = null;
 
@@ -62,10 +60,22 @@ if ($method === 'GET') {
         }
     }
 
-    $stmt = $conn->prepare("INSERT INTO songs (id, title, artist, source_type, source_url, file_path, thumbnail, duration, lyrics, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssisss", $id, $_POST['title'], $_POST['artist'], $_POST['source_type'], $_POST['source_url'], $file_path, $_POST['thumbnail'], $_POST['duration'], $_POST['lyrics'], $created_at);
+    $stmt = $pdo->prepare("INSERT INTO songs (id, title, artist, source_type, source_url, file_path, thumbnail, duration, lyrics, created_at) VALUES (:id, :title, :artist, :source_type, :source_url, :file_path, :thumbnail, :duration, :lyrics, :created_at)");
 
-    if ($stmt->execute()) {
+    $params = [
+        ':id' => $id,
+        ':title' => $_POST['title'],
+        ':artist' => $_POST['artist'],
+        ':source_type' => $_POST['source_type'],
+        ':source_url' => $_POST['source_url'] ?? null,
+        ':file_path' => $file_path,
+        ':thumbnail' => $_POST['thumbnail'] ?? null,
+        ':duration' => $_POST['duration'] ?? null,
+        ':lyrics' => $_POST['lyrics'] ?? null,
+        ':created_at' => $created_at
+    ];
+
+    if ($stmt->execute($params)) {
         http_response_code(201);
         echo json_encode(["id" => $id, "title" => $_POST['title'], "artist" => $_POST['artist'], "created_at" => $created_at]);
     } else {
@@ -82,19 +92,16 @@ if ($method === 'GET') {
     }
 
     $id = $_GET['id'];
-    $stmt = $conn->prepare("SELECT file_path FROM songs WHERE id = ?");
-    $stmt->bind_param("s", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $song = $result->fetch_assoc();
+    $stmt = $pdo->prepare("SELECT file_path FROM songs WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    $song = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($song && !empty($song['file_path']) && file_exists($song['file_path'])) {
         unlink($song['file_path']);
     }
 
-    $stmt = $conn->prepare("DELETE FROM songs WHERE id = ?");
-    $stmt->bind_param("s", $id);
-    if ($stmt->execute()) {
+    $stmt = $pdo->prepare("DELETE FROM songs WHERE id = :id");
+    if ($stmt->execute([':id' => $id])) {
         http_response_code(200);
         echo json_encode(["message" => "Song deleted"]);
     } else {
@@ -102,5 +109,3 @@ if ($method === 'GET') {
         echo json_encode(["message" => "Failed to delete song."]);
     }
 }
-
-$conn->close();

@@ -35,18 +35,18 @@ if (empty($username) || empty($password)) {
     exit();
 }
 
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-if ($conn->connect_error) {
+try {
+    $pdo = new PDO('sqlite:' . DB_PATH);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(["message" => "Database connection failed"]);
+    echo json_encode(["message" => "Database connection failed: " . $e->getMessage()]);
     exit();
 }
 
-$stmt = $conn->prepare("SELECT * FROM admins WHERE username = ?");
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
-$admin = $result->fetch_assoc();
+$stmt = $pdo->prepare("SELECT * FROM admins WHERE username = :username");
+$stmt->execute([':username' => $username]);
+$admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$admin || !password_verify($password, $admin['password'])) {
     http_response_code(401);
