@@ -107,15 +107,6 @@ if ($step === 2) {
                 <input type="password" id="db_pass" name="db_pass">
             </div>
 
-            <h2>Admin Account</h2>
-             <div class="form-group">
-                <label for="admin_user">Admin Username</label>
-                <input type="text" id="admin_user" name="admin_user" value="admin" required>
-            </div>
-            <div class="form-group">
-                <label for="admin_pass">Admin Password</label>
-                <input type="password" id="admin_pass" name="admin_pass" required>
-            </div>
 
             <h2>API Keys</h2>
              <div class="form-group">
