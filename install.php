@@ -18,8 +18,8 @@ if ($step === 2) {
     $db_name = $_POST['db_name'];
     $db_user = $_POST['db_user'];
     $db_pass = $_POST['db_pass'];
-    $admin_user = $_POST['admin_user'];
-    $admin_pass = $_POST['admin_pass'];
+    $admin_user = 'admin';
+    $admin_pass = 'admin123';
     $youtube_api_key = $_POST['youtube_api_key'];
 
     // Generate a random JWT secret
@@ -54,7 +54,7 @@ if ($step === 2) {
     }
 
     // 4. Create default admin
-    $hashed_password = password_hash($admin_pass, PASSWORD_DEFAULT);
+    $hashed_password = password_hash($admin_pass, PASSWORD_BCRYPT);
     $stmt = $conn->prepare("INSERT INTO admins (username, password) VALUES (?, ?)");
     $stmt->bind_param("ss", $admin_user, $hashed_password);
     $stmt->execute();
@@ -107,15 +107,6 @@ if ($step === 2) {
                 <input type="password" id="db_pass" name="db_pass">
             </div>
 
-            <h2>Admin Account</h2>
-             <div class="form-group">
-                <label for="admin_user">Admin Username</label>
-                <input type="text" id="admin_user" name="admin_user" value="admin" required>
-            </div>
-            <div class="form-group">
-                <label for="admin_pass">Admin Password</label>
-                <input type="password" id="admin_pass" name="admin_pass" required>
-            </div>
 
             <h2>API Keys</h2>
              <div class="form-group">
@@ -128,6 +119,9 @@ if ($step === 2) {
     <?php elseif ($step === 2): ?>
         <p class="success"><b>Installation Complete!</b></p>
         <p>The application has been installed successfully.</p>
+        <p>You can now log in with the default credentials:</p>
+        <p><b>Username:</b> admin</p>
+        <p><b>Password:</b> admin123</p>
         <p class="error"><b>IMPORTANT:</b> For security reasons, please delete this `install.php` file now.</p>
     <?php endif; ?>
 </body>
