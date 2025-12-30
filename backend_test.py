@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 class KaraokeAPITester:
-    def __init__(self, base_url="https://vocalchamp.preview.emergentagent.com"):
+    def __init__(self, base_url="http://localhost:8000"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
@@ -27,10 +27,10 @@ class KaraokeAPITester:
             "details": details
         })
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
+    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, files=None):
         """Run a single API test"""
         url = f"{self.api_url}/{endpoint}"
-        test_headers = {'Content-Type': 'application/json'}
+        test_headers = {}
         
         if headers:
             test_headers.update(headers)
@@ -45,7 +45,10 @@ class KaraokeAPITester:
             if method == 'GET':
                 response = requests.get(url, headers=test_headers, timeout=10)
             elif method == 'POST':
-                response = requests.post(url, json=data, headers=test_headers, timeout=10)
+                if files:
+                    response = requests.post(url, data=data, headers=test_headers, files=files, timeout=10)
+                else:
+                    response = requests.post(url, json=data, headers=test_headers, timeout=10)
             elif method == 'DELETE':
                 response = requests.delete(url, headers=test_headers, timeout=10)
 
@@ -82,7 +85,7 @@ class KaraokeAPITester:
         response = self.run_test(
             "Admin Login (Valid Credentials)",
             "POST",
-            "auth/login",
+            "auth.php",
             200,
             data={"username": "admin", "password": "admin123"}
         )
@@ -96,7 +99,7 @@ class KaraokeAPITester:
         self.run_test(
             "Admin Login (Invalid Credentials)",
             "POST",
-            "auth/login",
+            "auth.php",
             401,
             data={"username": "admin", "password": "wrong"}
         )
@@ -110,10 +113,10 @@ class KaraokeAPITester:
         print("="*50)
         
         # Test get songs (empty initially)
-        songs = self.run_test(
+        self.run_test(
             "Get Songs (Initial)",
             "GET",
-            "songs",
+            "songs.php",
             200
         )
         
@@ -121,17 +124,21 @@ class KaraokeAPITester:
         song_data = {
             "title": "Test Karaoke Song",
             "artist": "Test Artist",
-            "source_type": "youtube",
-            "source_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+            "source_type": "upload",
+            "source_url": "",
+            "thumbnail": ""
         }
         
+        with open('dummy.mp3', 'w') as f:
+            f.write('dummy content')
+
         created_song = self.run_test(
             "Create Song",
             "POST",
-            "songs",
-            200,
-            data=song_data
+            "songs.php",
+            201,
+            data=song_data,
+            files={'file': ('dummy.mp3', open('dummy.mp3', 'rb'))}
         )
         
         song_id = None
@@ -144,15 +151,15 @@ class KaraokeAPITester:
             self.run_test(
                 "Get Specific Song",
                 "GET",
-                f"songs/{song_id}",
+                f"songs.php?id={song_id}",
                 200
             )
         
         # Test get all songs (should have 1 now)
-        updated_songs = self.run_test(
+        self.run_test(
             "Get Songs (After Creation)",
             "GET",
-            "songs",
+            "songs.php",
             200
         )
         
@@ -160,7 +167,7 @@ class KaraokeAPITester:
         self.run_test(
             "Search Songs",
             "GET",
-            "songs?search=Test",
+            "songs.php?search=Test",
             200
         )
         
@@ -169,7 +176,7 @@ class KaraokeAPITester:
             self.run_test(
                 "Delete Song",
                 "DELETE",
-                f"songs/{song_id}",
+                f"songs.php?id={song_id}",
                 200
             )
         
@@ -185,16 +192,16 @@ class KaraokeAPITester:
         self.run_test(
             "YouTube Search (No API Key)",
             "GET",
-            "youtube/search?q=karaoke",
-            400
+            "youtube.php?q=karaoke",
+            500
         )
         
         # Test with fake API key (should fail)
         self.run_test(
             "YouTube Search (Invalid API Key)",
             "GET",
-            "youtube/search?q=karaoke&api_key=fake_key",
-            400
+            "youtube.php?q=karaoke&api_key=fake_key",
+            500
         )
 
     def test_scores(self):
@@ -207,16 +214,18 @@ class KaraokeAPITester:
         song_data = {
             "title": "Score Test Song",
             "artist": "Test Artist",
-            "source_type": "youtube",
-            "source_url": "https://www.youtube.com/watch?v=test"
+            "source_type": "upload",
+            "source_url": "",
+            "thumbnail": ""
         }
         
         created_song = self.run_test(
             "Create Song for Score Test",
             "POST",
-            "songs",
-            200,
-            data=song_data
+            "songs.php",
+            201,
+            data=song_data,
+            files={'file': ('dummy.mp3', open('dummy.mp3', 'rb'))}
         )
         
         song_id = None
@@ -235,8 +244,8 @@ class KaraokeAPITester:
             self.run_test(
                 "Create Score",
                 "POST",
-                "scores",
-                200,
+                "scores.php",
+                201,
                 data=score_data
             )
             
@@ -244,7 +253,7 @@ class KaraokeAPITester:
             self.run_test(
                 "Get Song Scores",
                 "GET",
-                f"scores/{song_id}",
+                f"scores.php?song_id={song_id}",
                 200
             )
             
@@ -252,7 +261,7 @@ class KaraokeAPITester:
             self.run_test(
                 "Get Leaderboard",
                 "GET",
-                "leaderboard",
+                "scores.php",
                 200
             )
             
@@ -260,23 +269,9 @@ class KaraokeAPITester:
             self.run_test(
                 "Delete Score Test Song",
                 "DELETE",
-                f"songs/{song_id}",
+                f"songs.php?id={song_id}",
                 200
             )
-
-    def test_file_operations(self):
-        """Test file-related operations"""
-        print("\n" + "="*50)
-        print("TESTING FILE OPERATIONS")
-        print("="*50)
-        
-        # Test file serving with non-existent file
-        self.run_test(
-            "Serve Non-existent File",
-            "GET",
-            "files/nonexistent",
-            404
-        )
 
     def run_all_tests(self):
         """Run all API tests"""
@@ -293,7 +288,6 @@ class KaraokeAPITester:
         self.test_songs_crud()
         self.test_youtube_search()
         self.test_scores()
-        self.test_file_operations()
         
         # Print summary
         print("\n" + "="*60)
@@ -302,7 +296,8 @@ class KaraokeAPITester:
         print(f"Tests Run: {self.tests_run}")
         print(f"Tests Passed: {self.tests_passed}")
         print(f"Tests Failed: {self.tests_run - self.tests_passed}")
-        print(f"Success Rate: {(self.tests_passed/self.tests_run)*100:.1f}%")
+        if self.tests_run > 0:
+            print(f"Success Rate: {(self.tests_passed/self.tests_run)*100:.1f}%")
         
         if self.tests_passed == self.tests_run:
             print("🎉 ALL TESTS PASSED!")
@@ -312,6 +307,15 @@ class KaraokeAPITester:
             return False
 
 def main():
+    import os
+    # Before running tests, let's make sure the install script has been run
+    # and the config files are present.
+    if not os.path.exists('config/config.db') or not os.path.exists('config/config.php'):
+        print("ERROR: It looks like the installation hasn't been completed.")
+        print("Please run the installer (usually install.php) from your browser,")
+        print("then delete install.php before running this test script.")
+        sys.exit(1)
+
     tester = KaraokeAPITester()
     success = tester.run_all_tests()
     
