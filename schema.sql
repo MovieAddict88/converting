@@ -1,8 +1,10 @@
 CREATE TABLE IF NOT EXISTS `admins` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `username` varchar(255) NOT NULL UNIQUE,
-  `password` varchar(255) NOT NULL
-);
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `songs` (
   `id` varchar(36) NOT NULL,
@@ -16,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `songs` (
   `lyrics` text DEFAULT NULL,
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `scores` (
   `id` varchar(36) NOT NULL,
@@ -26,5 +28,6 @@ CREATE TABLE IF NOT EXISTS `scores` (
   `accuracy` float NOT NULL,
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`) ON DELETE CASCADE
-);
+  KEY `song_id` (`song_id`),
+  CONSTRAINT `scores_ibfk_1` FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
