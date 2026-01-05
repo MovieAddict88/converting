@@ -1,0 +1,80 @@
+# Configuration (contains sensitive data)
+config.php
+.env
+
+# Uploads directory (contains user files)
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+*.log
+logs/
+error.log
+access.log
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Backup files
+*.bak
+*.backup
+*.old
+*~
+
+# Cache and temp
+cache/
+tmp/
+temp/
+*.cache
+
+# Composer (if using)
+/vendor/
+
+# Node modules (from original React app)
+node_modules/
+frontend/node_modules/
+
+# Build outputs
+/build/
+/dist/
+/frontend/build/
+/frontend/dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+backend/__pycache__/
+*.egg-info/
+dist/
+build/
+
+# Testing
+coverage/
+.nyc_output/
+.phpunit.result.cache
+
+# Environment files (keep examples)
+.env.local
+.env.*.local

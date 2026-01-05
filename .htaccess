@@ -1,0 +1,52 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirect install.php to root if config doesn't exist
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-L
+    RewriteRule ^install\.php$ - [L]
+
+    # API routing
+    RewriteRule ^api/(.*)$ api/index.php/$1 [L,QSA]
+
+    # Remove .php extension
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME}\.php -f
+    RewriteRule ^(.*)$ $1.php [L]
+
+    # Redirect to install if config doesn't exist and not already on install page
+    RewriteCond %{REQUEST_URI} !^/install\.php
+    RewriteCond %{REQUEST_URI} !^/api/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{DOCUMENT_ROOT}/config.php !-f
+    RewriteRule ^(.*)$ install.php [L]
+</IfModule>
+
+# Protect config file
+<Files config.php>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Protect uploads directory
+<FilesMatch "\.(php|phtml|php5|phps)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Enable compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
+</IfModule>
+
+# Set cache headers
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+</IfModule>
